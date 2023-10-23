@@ -1,11 +1,15 @@
 from boto3.dynamodb.conditions import Attr
-from DynaBridge.table import DynamoTable
 from DynaBridge.exceptions import *
-
-
+import time
+import functools
 class DynamoModel:
     _dynamo_table = None
-
+    @classmethod
+    def from_dict(cls, data):
+        instance = cls()
+        for key, value in data.items():
+            setattr(instance, key, value)
+        return instance
     @classmethod
     def set_dynamo_table(cls, dynamo_table):
         cls._dynamo_table = dynamo_table
@@ -34,19 +38,26 @@ class DynamoModel:
             raise ValueError(
                 "DynamoTable instance is not set. Call set_dynamo_table with a DynamoTable instance.")
 
+    def create(self):
+        created_obj=self._dynamo_table.save(self.get_self_json())
+        return self.from_dict(created_obj) if created_obj else None
+
     def save(self):
-        return self._dynamo_table.save(self.get_self_json())
+        saved_object=self._dynamo_table.save(self.get_self_json())
+        return self.from_dict(saved_object) if saved_object else None 
 
     def get(self):
-        return self._dynamo_table.get(self.fetch_key())
+        data = self._dynamo_table.get(self.fetch_key())
+        return self.from_dict(data) if data else None
 
     @classmethod
     def get_by_primary_key(cls, key):
-        return cls._dynamo_table.get(key)
+        response = cls._dynamo_table.get(key)
+        return cls.from_dict(response) if response else None
 
     @classmethod
     def get_all(cls):
-        return cls._dynamo_table.getAll()
+        return list(map(cls.from_dict, cls._dynamo_table.getAll())) 
 
     @classmethod
     def delete_by_primary_key(cls, key):
@@ -54,4 +65,33 @@ class DynamoModel:
 
     @classmethod
     def get_all_by_attribute(cls, attribute, value):
-        return cls._dynamo_table.scan(filter_expression=Attr(attribute).eq(value))
+        return list(map(cls.from_dict, cls._dynamo_table.scan(
+            Attr(attribute).eq(value))))
+
+    @classmethod
+    def transactional_lock(cls,func,max_retries=100,base_sleep = 0.1 ,max_sleep = 2.0 ,logger=None,custom_retrier=None):
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if not self._dynamo_table:
+                raise ValueError("DynamoTable instance is not set. Call set_dynamo_table with a DynamoTable instance.")
+            key = self.fetch_key()
+            original_version = self._dynamo_table.get(key).get(self._dynamo_table.get_version_attribute(), 0)
+            retries = 0
+            while retries < max_retries:
+                try:
+                    updated_version = self._dynamo_table.get(key).get(
+                        self._dynamo_table.get_version_attribute(), 0)
+                    if updated_version != original_version:
+                        if logger:
+                            logger.warning("Version mismatch, retrying.")
+                        sleep_time = min(base_sleep * 2**retries, max_sleep)
+                        time.sleep(sleep_time)
+                        retries += 1
+                        continue
+                    return func(self, *args, **kwargs)
+                except Exception as e:
+                    if logger:
+                        logger.error(f"Transaction failed: {e}")
+                    retries += 1
+            raise Exception("Max retry attempts exceeded")
+        return wrapper

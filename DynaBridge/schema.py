@@ -2,12 +2,25 @@ from DynaBridge.attribute import DynamoAttribute
 from DynaBridge.exceptions import DynamoAttributeError, DynamoTypeError, DynamoValueError
 
 
+# The DynamoSchema class is used to store and manage attributes for a DynamoDB schema.
 class DynamoSchema:
     def __init__(self):
+        """
+        The above function is a constructor that initializes two empty lists, `attributes` and
+        `attribute_map`.
+        """
         self.attributes = []
         self.attribute_map = {}
 
     def add_attributes(self, attributes):
+        """
+        The `add_attributes` function adds attributes to an object, checking that each attribute is of type
+        DynamoAttribute.
+        
+        :param attributes: The `attributes` parameter is a list of `DynamoAttribute` objects that are being
+        added to the current object
+        :return: The method `add_attributes` is returning `self`.
+        """
         try:
             for attribute in attributes:
                 if not isinstance(attribute, DynamoAttribute):
@@ -68,7 +81,12 @@ class DynamoSchema:
         return True
 
     def fill_defaults(self, item):
-        print(item)
+        """
+        The `fill_defaults` function fills in missing attributes in an item dictionary with their default
+        values.
+        
+        :param item: The `item` parameter is a dictionary that represents an item or object
+        """
         for attribute in self.attributes:
             attribute_name = attribute.get_attribute_name()
             if attribute_name not in item:
@@ -76,10 +94,24 @@ class DynamoSchema:
         return item
 
     def get_schema(self):
+        """
+        The function `get_schema` returns a list of attribute information for each attribute in the object's
+        attributes list.
+        :return: A list of attribute information for each attribute in the self.attributes list.
+        """
         return [attribute.get_attribute_info() for attribute in self.attributes]
 
     def get_schema_json(self):
+        """
+        The function `get_schema_json` returns a JSON representation of the attributes in an object.
+        :return: a JSON object that contains the attribute names as keys and the attribute JSON
+        representations as values.
+        """
         return {attribute.get_attribute_name(): attribute.get_attribute_json() for attribute in self.attributes}
 
     def get_attribute_map(self):
+        """
+        The function returns the attribute map of an object.
+        :return: The `get_attribute_map` method is returning the `attribute_map` attribute.
+        """
         return self.attribute_map
