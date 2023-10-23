@@ -298,9 +298,10 @@ class DynamoTable:
             if response['ResponseMetadata']['HTTPStatusCode'] == 200 and 'Item' in response:
                 return response['Item']
             else:
-                self._handle_error('get', response)
+                return None
         except Exception as e:
             self._handle_error('get', e)
+            return None
 
     def getAll(self):
         """
@@ -314,9 +315,10 @@ class DynamoTable:
             if response['ResponseMetadata']['HTTPStatusCode'] == 200:
                 return response['Items']
             else:
-                self._handle_error('getAll', response)
+                return None
         except Exception as e:
             self._handle_error('getAll', e)
+            return None
     def batch_write(self, items):
         """
         The `batch_write` function writes a batch of items to a database using a batch writer, and returns a

@@ -1,3 +1,4 @@
+README.md
 setup.py
 DynaBridge/__init__.py
 DynaBridge/attribute.py

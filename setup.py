@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="DynaBridge",
-    version="0.0.1",
+    version="0.0.5",
     packages=find_packages(),
     author='Kushagra Indurkhya',
     author_email='kushagraindurkhya7@gmail.com',
