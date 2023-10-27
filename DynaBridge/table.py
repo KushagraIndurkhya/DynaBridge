@@ -390,7 +390,16 @@ class DynamoTable:
             return self._handle_response(response)
         except Exception as e:
             self._handle_error('delete', e)
-    
+    def get_schema(self):
+        """
+        The function `get_schema` returns the schema attribute of an object, or handles any exceptions that
+        occur.
+        :return: The code is returning the value of the `__schema` attribute.
+        """
+        try:
+            return self.__schema
+        except Exception as e:
+            self._handle_error('get_schema', e)
 
 
     

@@ -31,10 +31,14 @@ class DynamoModel:
             sort_key: self.__dict__[sort_key]
         }
         return key
-    def __init__(self):
+    def __init__(self,**kwargs):
         if self._dynamo_table is None:
             raise ValueError(
                 "DynamoTable instance is not set. Call set_dynamo_table with a DynamoTable instance.")
+        if kwargs:
+            for key, value in kwargs.items():
+                if key in self._dynamo_table.get_schema().get_schema_json():
+                    setattr(self, key, value)
     def create(self):
         created_obj=self._dynamo_table.save(self.get_self_json())
         return self.from_dict(created_obj) if created_obj else None

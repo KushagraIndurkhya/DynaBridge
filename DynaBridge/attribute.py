@@ -66,12 +66,11 @@ class DynamoAttribute:
         The function `_verify_defaults` checks if the default value of an attribute is of the correct
         type.
         """
-        if self.__attribute_default is None:
-            self.__attribute_default = self._initialize_defaults()
-        else:
+        if self.__attribute_default is not None:
             if not isinstance(self.__attribute_default, DynamoAttribute.types[self.__attribute_type]):
-                raise DynamoTypeError(
-                    f"Default value {self.__attribute_default} is not of type {self.__attribute_type}")
+                raise DynamoValueError(
+                    f"Default value {self.__attribute_default} is not of type {self.__attribute_type}"
+                )
 
     def __init__(self, attribute_name, data_type, attribute_default=None, attribute_required=False, attribute_immutable=False, attribute_validator=None):
         """
@@ -127,7 +126,7 @@ class DynamoAttribute:
         The function returns the value of the attribute named "__attribute_default".
         :return: The method is returning the value of the attribute named "__attribute_default".
         """
-        return self.__attribute_default
+        return self._initialize_defaults()
 
     def is_attribute_required(self):
         """
