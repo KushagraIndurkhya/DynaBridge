@@ -167,20 +167,6 @@ key = {'your_primary_key': 'key_value'}
 DynamoModel.delete_by_primary_key(key)
 ```
 
-### Performing a Transactional Operation
-
-```python
-# Define a DynamoModel class
-class MyModel(DynamoModel):
-    def my_custom_operation(self, new_value):
-        # Define a custom operation
-        self.your_attribute = new_value
-        self.save()
-
-# Create a model instance and perform a transactional operation
-model_instance = MyModel()
-model_instance.my_custom_operation('new_value')
-```
 ## Sample App
 
 Here is an example app that defines a User model using DynamoModel and performs basic operations on it using DynamoBridge:

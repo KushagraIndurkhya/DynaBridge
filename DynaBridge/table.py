@@ -240,10 +240,6 @@ class DynamoTable:
                 item[self.__version_attribute] = item[self.__version_attribute] + 1
             if self.__last_update_attribute is not None:
                 item[self.__last_update_attribute] = TimeUtills.get_current_utc_datetime()
-            if self.__schema is not None:
-                self.__schema.fill_defaults(item)
-                self.__schema.validate(item)
-
             response = self.__db_resource.put_item(
                 TableName=self.__table_name,
                 Item=item

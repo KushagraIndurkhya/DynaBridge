@@ -5,6 +5,8 @@ from DynaBridge.attribute import *
 from DynaBridge.schema import *
 import boto3
 
+
+
 if __name__ == "__main__":
     # Create a DynamoTable
     UserTable = DynamoTable(table_name='User', db_resource=boto3.resource(
@@ -50,35 +52,39 @@ if __name__ == "__main__":
     user = User(Name='John', Country='India',
                 Email='john@example.com', Status='Active').save()
     print(f"User created: {user.get_self_json()}")
+    user = User(Name='John', Country='India',
+                Email='john@example.com', Status='Active').save()
+    print(f"User created: {user.get_self_json()}")
+    print("Retrieving user schema")
+    print(UserSchema.get_schema())
+    # # Retrieve the user by primary key
+    # retrieved_user = User.get_by_primary_key(key={'UserId': user.UserId})
+    # print(f"Retrieved user: {retrieved_user.get_self_json()}")
 
-    # Retrieve the user by primary key
-    retrieved_user = User.get_by_primary_key(key={'UserId': user.UserId})
-    print(f"Retrieved user: {retrieved_user.get_self_json()}")
+    # # Retrieve all users with a specific attribute value
+    # users_in_india = User.get_all_by_attribute(
+    #     attribute='Country', value='India')
+    # print("Users in India:")
+    # for user in users_in_india:
+    #     print(user.get_self_json())
 
-    # Retrieve all users with a specific attribute value
-    users_in_india = User.get_all_by_attribute(
-        attribute='Country', value='India')
-    print("Users in India:")
-    for user in users_in_india:
-        print(user.get_self_json())
+    # # Update the user
+    # user.Name = 'Updated John'
+    # user.save()
+    # print(f"User updated: {user.get_self_json()}")
 
-    # Update the user
-    user.Name = 'Updated John'
-    user.save()
-    print(f"User updated: {user.get_self_json()}")
+    # user.update_status(new_status='Inactive')
+    # # Additional feature: Conditional updates
+    # user.Status = 'Suspended'
+    # user.save_if(lambda obj: obj.Status == 'Active')
+    # print(f"User updated with condition: {user.get_self_json()}")
 
-    user.update_status(new_status='Inactive')
-    # Additional feature: Conditional updates
-    user.Status = 'Suspended'
-    user.save_if(lambda obj: obj.Status == 'Active')
-    print(f"User updated with condition: {user.get_self_json()}")
+    # # Delete the user
+    # user.delete()
+    # print("User deleted")
 
-    # Delete the user
-    user.delete()
-    print("User deleted")
-
-    # Check if the user exists
-    if User.exists(key={'UserId': user.UserId}):
-        print("User exists")
-    else:
-        print("User does not exist")
+    # # Check if the user exists
+    # if User.exists(key={'UserId': user.UserId}):
+    #     print("User exists")
+    # else:
+    #     print("User does not exist")
